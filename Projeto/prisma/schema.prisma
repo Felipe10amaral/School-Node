@@ -11,11 +11,24 @@ datasource db {
 }
 
 model OrderServices {
-  id        String @id @default(uuid())
-  name      String
-  model     String
-  service   String
-  value     Float
-  guarantee String
-  numberOs  Int    @unique
+  id          String   @id @default(uuid())
+  name_client String
+  tel_client  String
+  model       String
+  service     String
+  value       Float
+  guarantee   String
+  numberOs    String   @unique
+  create_at   DateTime @default(now())
+
+  adm    Adm    @relation(fields: [adm_id], references: [id])
+  adm_id String
+}
+
+model Adm {
+  id            String          @id @default(uuid())
+  name          String
+  user          String          @unique
+  password_hash String
+  OrderServices OrderServices[]
 }

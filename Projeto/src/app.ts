@@ -1,17 +1,27 @@
-import express from 'express'
-import { PrismaClient } from '@prisma/client'
+import express, { Request, Response } from 'express'
+import { z } from 'zod'
+import { prisma } from './model/prisma'
 
 export const app = express()
 
-const prisma = new PrismaClient()
+app.use(express.json())
 
-prisma.orderServices.create({
-  data: {
-    name: 'Felipe',
-    numberOs: 1,
-    model: 'iPhone Xr',
-    service: 'troca de bateria',
-    value: 400,
-    guarantee: '90 dias',
-  },
+app.post('/users', async (request: Request, response: Response) => {
+  const registerSchema = z.object({
+    name: z.string(),
+    user: z.string(),
+    password: z.string().min(6),
+  })
+
+  const { name, password, user } = registerSchema.parse(request.body)
+
+  await prisma.adm.create({
+    data: {
+      name,
+      user,
+      password_hash: password,
+    },
+  })
+
+  return response.status(201).send()
 })
