@@ -1,4 +1,4 @@
-import mongoose, { Schema } from 'mongoose'
+import mongoose, { InferSchemaType, Schema } from 'mongoose'
 
 export const OrderServiceSchema = new Schema({
   name: {
@@ -30,10 +30,10 @@ export const OrderServiceSchema = new Schema({
     type: String,
   },
 
-  createAt: {
+  createdAt: {
     type: Date,
-    default: new Date(),
   },
 })
 
 export const OrderService = mongoose.model('OrderService', OrderServiceSchema)
+export type SchemaOrderService = InferSchemaType<typeof OrderServiceSchema>

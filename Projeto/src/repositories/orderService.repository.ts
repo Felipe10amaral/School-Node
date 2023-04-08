@@ -1,6 +1,6 @@
-import { OrderService } from '../model/orderService.model'
+import { OrderService, SchemaOrderService } from '../model/orderService.model'
 
-class OrderServiceRepository {
+export class OrderServiceRepository {
   async getAll() {
     return await OrderService.find()
   }
@@ -9,8 +9,9 @@ class OrderServiceRepository {
     return await OrderService.findOne({ cpf })
   }
 
-  async create(orderService: typeof OrderService) {
-    return await OrderService.create(orderService)
+  async create(orderService: SchemaOrderService) {
+    const os = await OrderService.create(orderService)
+    return os
   }
 
   async update(cpf: string, orderService: Partial<typeof OrderService>) {
@@ -21,5 +22,3 @@ class OrderServiceRepository {
     return await OrderService.deleteOne({ cpf })
   }
 }
-
-export default new OrderServiceRepository()

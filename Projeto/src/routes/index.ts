@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { userRouter } from './users.routes'
+import { orderServicesRouter } from './orderService.routes'
 
 export const routes = Router()
 
-routes.use('/users', userRouter)
+routes.use('/order', orderServicesRouter)
