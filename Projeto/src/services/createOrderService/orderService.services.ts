@@ -1,20 +1,23 @@
-import { OrderServiceRepository } from '../repositories/orderService.repository'
-// import { OrderService } from '../model/orderService.model'
 import { z } from 'zod'
+import orderServiceRepository from '../../repositories/orderService.repository'
+import { OrderServiceAlreadyExists } from '../../errors/orderServicesAlreadyExists.error'
 
 class OrderServiceServices {
-  constructor(private orderServiceRepository = new OrderServiceRepository()) {}
-
-  getAll() {
-    this.orderServiceRepository.getAll()
-  }
   /*
+  
   getByOrder(cpf: string) {
     orderServiceRepository.getByOneOrder(cpf)
   } */
 
-  create(data: object) {
+  async getAll() {
+    const response = await orderServiceRepository.getAll()
+
+    return response
+  }
+
+  async create(orderService: object) {
     const registerSchema = z.object({
+      numberOS: z.string(),
       name: z.string(),
       telefone: z.string(),
       cpf: z.string(),
@@ -25,10 +28,17 @@ class OrderServiceServices {
       createdAt: z.date().default(new Date()),
     })
 
-    const os = registerSchema.parse(data)
+    const os = registerSchema.parse(orderService)
+    const { numberOS } = os
 
-    const response = this.orderServiceRepository.create(os)
-    return response
+    const orderServiceWithSameNumberOs =
+      await orderServiceRepository.getByOneOrder(numberOS)
+
+    if (orderServiceWithSameNumberOs) {
+      throw OrderServiceAlreadyExists()
+    }
+
+    await orderServiceRepository.create(os)
   }
   /*
   remove(cpf: string) {

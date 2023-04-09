@@ -1,6 +1,11 @@
 import mongoose, { InferSchemaType, Schema } from 'mongoose'
 
 export const OrderServiceSchema = new Schema({
+  numberOS: {
+    type: String,
+    unique: true,
+  },
+
   name: {
     type: String,
   },
@@ -11,7 +16,6 @@ export const OrderServiceSchema = new Schema({
 
   cpf: {
     type: String,
-    unique: true,
   },
 
   model: {

@@ -1,15 +1,26 @@
 import { Router, Request, Response } from 'express'
-import orderServiceServices from '../services/orderService.services'
+import orderServices from '../services/createOrderService/orderService.services'
 
 export const orderServicesRouter = Router()
 
 orderServicesRouter.get('/', async (req: Request, res: Response) => {
-  const os = orderServiceServices.getAll()
-  return res.status(201).send(os)
+  const os = await orderServices.getAll()
+  console.log(os)
+  return res.status(200).send(os)
 })
 
-orderServicesRouter.post('/', async (req: Request, res: Response) => {
-  const os = orderServiceServices.create(req.body)
+orderServicesRouter.get('/:numberOS', async (req: Request, res: Response) => {})
 
-  return res.status(200).send(os)
+orderServicesRouter.post('/', async (req: Request, res: Response) => {
+  try {
+    await orderServices.create(req.body)
+    return res
+      .status(201)
+      .send({ message: 'Ordem de serviço cadastrada com sucesso' })
+  } catch {
+    console.log()
+    return res
+      .status(409)
+      .send({ message: 'Ordem de serviço ja possui cadastro' })
+  }
 })
