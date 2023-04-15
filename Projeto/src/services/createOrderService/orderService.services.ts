@@ -1,16 +1,25 @@
 import { z } from 'zod'
+import { IOrderService } from '../../model/orderService.model'
 import orderServiceRepository from '../../repositories/orderService.repository'
-import { OrderServiceAlreadyExists } from '../../errors/orderServicesAlreadyExists.error'
+
+import { OrderServiceAlreadyExists } from '../../errors/orderServices/orderServicesAlreadyExists.error'
+import { OrderServiceNotFound } from '../../errors/orderServices/orderServiceNotFound.error'
 
 class OrderServiceServices {
-  /*
-  
-  getByOrder(cpf: string) {
-    orderServiceRepository.getByOneOrder(cpf)
-  } */
+  async getByOrder(numberOS: string) {
+    const os = await orderServiceRepository.getByOneOrder(numberOS)
+
+    if (!os) {
+      throw new OrderServiceNotFound()
+    }
+    return os
+  }
 
   async getAll() {
     const response = await orderServiceRepository.getAll()
+    if (!response) {
+      throw new OrderServiceNotFound()
+    }
 
     return response
   }
@@ -35,19 +44,43 @@ class OrderServiceServices {
       await orderServiceRepository.getByOneOrder(numberOS)
 
     if (orderServiceWithSameNumberOs) {
-      throw OrderServiceAlreadyExists()
+      throw new OrderServiceAlreadyExists()
     }
 
     await orderServiceRepository.create(os)
   }
-  /*
-  remove(cpf: string) {
-    return orderServiceRepository.deleteOne(cpf)
+
+  async remove(numberOS: string) {
+    const order = await orderServiceRepository.getByOneOrder(numberOS)
+
+    if (!order) {
+      throw new OrderServiceNotFound()
+    }
+    await orderServiceRepository.deleteOne(numberOS)
   }
 
-  update(cpf: string, orderService: Partial<typeof OrderService>) {
-    return orderServiceRepository.update(cpf, orderService)
-  } */
+  async update(numberOS: string, orderService: Partial<IOrderService>) {
+    const order = await orderServiceRepository.getByOneOrder(numberOS)
+    if (!order) {
+      throw new OrderServiceNotFound()
+    }
+
+    const registerSchema = z.object({
+      numberOS: z.string(),
+      name: z.string(),
+      telefone: z.string(),
+      cpf: z.string(),
+      model: z.string(),
+      repair: z.string(),
+      value: z.coerce.number(),
+      guarantee: z.string(),
+      createdAt: z.date().default(new Date()),
+    })
+
+    const os = registerSchema.parse(orderService)
+
+    return orderServiceRepository.update(numberOS, os)
+  }
 }
 
 export default new OrderServiceServices()

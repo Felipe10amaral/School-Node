@@ -5,11 +5,20 @@ export const orderServicesRouter = Router()
 
 orderServicesRouter.get('/', async (req: Request, res: Response) => {
   const os = await orderServices.getAll()
-  console.log(os)
+
   return res.status(200).send(os)
 })
 
-orderServicesRouter.get('/:numberOS', async (req: Request, res: Response) => {})
+orderServicesRouter.get('/:numberOS', async (req: Request, res: Response) => {
+  const { numberOS } = req.params
+
+  try {
+    const os = await orderServices.getByOrder(numberOS)
+    return res.status(200).send(os)
+  } catch (error: any) {
+    return res.status(400).send({ message: error.message })
+  }
+})
 
 orderServicesRouter.post('/', async (req: Request, res: Response) => {
   try {
@@ -17,10 +26,34 @@ orderServicesRouter.post('/', async (req: Request, res: Response) => {
     return res
       .status(201)
       .send({ message: 'Ordem de serviço cadastrada com sucesso' })
-  } catch {
-    console.log()
-    return res
-      .status(409)
-      .send({ message: 'Ordem de serviço ja possui cadastro' })
+  } catch (error: any) {
+    return res.status(400).send({ message: error.message })
   }
 })
+
+orderServicesRouter.delete(
+  '/:numberOS',
+  async (req: Request, res: Response) => {
+    const { numberOS } = req.params
+    try {
+      await orderServices.remove(numberOS)
+      return res
+        .status(200)
+        .send({ message: 'ordem de serviço excluida com sucesso ' })
+    } catch (error) {
+      return res.status(404).send({ message: `${error}` })
+    }
+  },
+
+  orderServicesRouter.put('/:numberOS', async (req: Request, res: Response) => {
+    const { numberOS } = req.params
+    const os = req.body
+
+    try {
+      await orderServices.update(numberOS, os)
+      return res.status(204).send()
+    } catch (error: any) {
+      return res.status(406).send({ message: `${error.message}` })
+    }
+  }),
+)

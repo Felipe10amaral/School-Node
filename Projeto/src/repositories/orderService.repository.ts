@@ -1,7 +1,7 @@
-import { OrderService, SchemaOrderService } from '../model/orderService.model'
+import { IOrderService, OrderService } from '../model/orderService.model'
 
 class OrderServiceRepository {
-  async create(orderService: SchemaOrderService) {
+  async create(orderService: IOrderService) {
     const os = await OrderService.create(orderService)
     return os
   }
@@ -15,12 +15,12 @@ class OrderServiceRepository {
     return await OrderService.findOne({ numberOS })
   }
 
-  async update(cpf: string, orderService: Partial<typeof OrderService>) {
-    return await OrderService.findOne({ cpf }, { $set: orderService })
+  async update(numberOS: string, orderService: Partial<IOrderService>) {
+    return await OrderService.updateOne({ numberOS }, { $set: orderService })
   }
 
-  async deleteOne(cpf: string) {
-    return await OrderService.deleteOne({ cpf })
+  async deleteOne(numberOS: string) {
+    return await OrderService.deleteOne({ numberOS })
   }
 }
 

@@ -1,6 +1,18 @@
-import mongoose, { InferSchemaType, Schema } from 'mongoose'
+import mongoose, { Schema } from 'mongoose'
 
-export const OrderServiceSchema = new Schema({
+export interface IOrderService {
+  numberOS: string
+  name: string
+  telefone: string
+  cpf: string
+  model: string
+  repair: string
+  value: number
+  guarantee: string
+  createdAt: Date
+}
+
+export const OrderServiceSchema = new Schema<IOrderService>({
   numberOS: {
     type: String,
     unique: true,
@@ -39,5 +51,7 @@ export const OrderServiceSchema = new Schema({
   },
 })
 
-export const OrderService = mongoose.model('OrderService', OrderServiceSchema)
-export type SchemaOrderService = InferSchemaType<typeof OrderServiceSchema>
+export const OrderService = mongoose.model<IOrderService>(
+  'OrderService',
+  OrderServiceSchema,
+)
