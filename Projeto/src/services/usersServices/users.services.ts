@@ -5,6 +5,10 @@ import { UserNotFound } from '../../errors/users/userNotFound.error'
 import { IUser } from '../../model/usersRoutes.model'
 import { compare, hash } from 'bcrypt'
 import { InvalidCredentials } from '../../errors/users/invalidCredentials.error'
+import { sign } from 'jsonwebtoken'
+import { env } from '../../env'
+
+const secretJWT = env.JWT_SECRET
 
 class UsersServices {
   async create(user: IUser) {
@@ -47,7 +51,9 @@ class UsersServices {
 
     const result = await compare(password, user.password)
     if (result) {
-      return user
+      return sign({ email: user.password, _id: user._id }, secretJWT, {
+        expiresIn: '1h',
+      })
     } else {
       throw new InvalidCredentials()
     }

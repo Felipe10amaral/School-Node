@@ -1,13 +1,18 @@
 import { Router, Request, Response } from 'express'
 import orderServices from '../services/createOrderService/orderService.services'
+import { authorizationMiddleware } from '../middlewares/authorization.middleware'
 
 export const orderServicesRouter = Router()
 
-orderServicesRouter.get('/', async (req: Request, res: Response) => {
-  const os = await orderServices.getAll()
+orderServicesRouter.get(
+  '/',
+  authorizationMiddleware,
+  async (req: Request, res: Response) => {
+    const os = await orderServices.getAll()
 
-  return res.status(200).send(os)
-})
+    return res.status(200).send(os)
+  },
+)
 
 orderServicesRouter.get('/:numberOS', async (req: Request, res: Response) => {
   const { numberOS } = req.params
@@ -20,19 +25,24 @@ orderServicesRouter.get('/:numberOS', async (req: Request, res: Response) => {
   }
 })
 
-orderServicesRouter.post('/', async (req: Request, res: Response) => {
-  try {
-    await orderServices.create(req.body)
-    return res
-      .status(201)
-      .send({ message: 'Ordem de serviço cadastrada com sucesso' })
-  } catch (error: any) {
-    return res.status(400).send({ message: error.message })
-  }
-})
+orderServicesRouter.post(
+  '/',
+  authorizationMiddleware,
+  async (req: Request, res: Response) => {
+    try {
+      await orderServices.create(req.body)
+      return res
+        .status(201)
+        .send({ message: 'Ordem de serviço cadastrada com sucesso' })
+    } catch (error: any) {
+      return res.status(400).send({ message: error.message })
+    }
+  },
+)
 
 orderServicesRouter.delete(
   '/:numberOS',
+  authorizationMiddleware,
   async (req: Request, res: Response) => {
     const { numberOS } = req.params
     try {
@@ -45,15 +55,19 @@ orderServicesRouter.delete(
     }
   },
 
-  orderServicesRouter.put('/:numberOS', async (req: Request, res: Response) => {
-    const { numberOS } = req.params
-    const os = req.body
+  orderServicesRouter.put(
+    '/:numberOS',
+    authorizationMiddleware,
+    async (req: Request, res: Response) => {
+      const { numberOS } = req.params
+      const os = req.body
 
-    try {
-      await orderServices.update(numberOS, os)
-      return res.status(204).send()
-    } catch (error: any) {
-      return res.status(406).send({ message: `${error.message}` })
-    }
-  }),
+      try {
+        await orderServices.update(numberOS, os)
+        return res.status(204).send()
+      } catch (error: any) {
+        return res.status(406).send({ message: `${error.message}` })
+      }
+    },
+  ),
 )
