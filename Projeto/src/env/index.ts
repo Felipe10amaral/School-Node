@@ -17,4 +17,4 @@ if (_env.success === false) {
   throw new Error('Invalid environment varable ')
 }
 
-export const env = _env.data // caso tudo dé certo
+export const env = _env.data // caso tudo dê certo
