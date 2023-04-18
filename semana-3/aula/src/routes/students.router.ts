@@ -1,96 +1,83 @@
 import { Request, Response, Router } from 'express'
+import studentService from '../services/students.services'
+import { authorizationMiddleware } from '../middlewares/authorization.middlewares'
 
 export const routerStudents = Router()
 
-const students = [
-  {
-    name: 'felipe',
-    email: 'felipe@gmail.com',
-    document: '123456789',
-    password: 123456,
-    age: 29,
+routerStudents.post(
+  '/authorization',
+  async (request: Request, response: Response) => {
+    const { document, password } = request.body
+    try {
+      const token = await studentService.authorization(document, password)
+      return response.status(200).send({ token })
+    } catch (error: any) {
+      response.status(401).send({ message: error.message })
+    }
   },
-  {
-    name: 'tufao',
-    email: 'tufao@gmail.com',
-    document: '213456789',
-    password: 213456,
-    age: 4,
+)
+
+routerStudents.get(
+  '/',
+  authorizationMiddleware,
+  async (request: Request, response: Response) => {
+    const students = await studentService.listAll()
+    return response.status(200).send(students)
   },
-  {
-    name: 'tamires',
-    email: 'tamires@gmail.com',
-    document: '133456789',
-    password: 133456,
-    age: 29,
+)
+
+routerStudents.post(
+  '/',
+  authorizationMiddleware,
+  (request: Request, response: Response) => {
+    const students = studentService.save(request.body)
+
+    return response.status(201).send(students)
   },
-]
-
-routerStudents.get('/', (request: Request, response: Response) => {
-  return response.status(200).send(students)
-})
-
-routerStudents.post('/', (request: Request, response: Response) => {
-  const { name, email, document, password, age } = request.body
-
-  const newArray = students.push({
-    name,
-    email,
-    document,
-    password,
-    age,
-  })
-
-  console.log(newArray)
-
-  return response.status(201).send()
-})
+)
 
 routerStudents.delete(
   '/remove/:document',
-  (request: Request, response: Response) => {
+  authorizationMiddleware,
+  async (request: Request, response: Response) => {
     const { document } = request.params
-    console.log(document)
+    const student = await studentService.delete(document)
 
-    const student = students.findIndex(
-      (documentId) => documentId.document === document,
-    )
-
-    if (student === -1) {
+    if (!student) {
       return response.status(400).send({ message: 'estudante não encontrado' })
     }
-
-    students.splice(student, 1)
 
     return response.status(200).send()
   },
 )
 
-routerStudents.put('/:document', (request: Request, response: Response) => {
-  const { document } = request.params
+routerStudents.put(
+  '/:document',
+  authorizationMiddleware,
+  async (request: Request, response: Response) => {
+    const { document } = request.params
 
-  console.log(document)
+    const student = await studentService.update(document, request.body)
 
-  const student = students.findIndex(
-    (documentId) => documentId.document === document,
-  )
+    if (!student) {
+      return response.status(400).send({ message: 'estudante não encontrado' })
+    }
 
-  if (student === -1) {
-    return response.status(400).send({ message: 'estudante não encontrado' })
-  }
+    return response.status(200).send({ message: 'atualizado' })
+  },
+)
 
-  students[student] = request.body
+routerStudents.get(
+  '/:document',
+  authorizationMiddleware,
+  async (request: Request, response: Response) => {
+    const { document } = request.params
+    const student = await studentService.listOneStudent(document)
 
-  return response.status(200).send({ message: 'atualizado' })
-})
+    if (!student) {
+      return response.status(400).send({ message: 'estudante não encontrado' })
+    }
 
-routerStudents.get('/:document', (request: Request, response: Response) => {
-  const { document } = request.params
-  const student = students.find((student) => student.document === document)
-
-  if (!student) {
-    return response.status(400).send({ message: 'estudante não encontrado' })
-  }
-
-  return response.status(200).send(student)
-})
+    return response.status(200).send(student)
+  },
+)

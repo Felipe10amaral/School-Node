@@ -1,14 +1,20 @@
 import express from 'express'
 import cors from 'cors'
 import { router } from './routes'
+import connection from './config/database'
 
 const app = express()
-
+const port = 3000
 app.use(cors())
 app.use(express.json())
 
-app.use(router)
+connection
+  .then(() => {
+    console.log('database is connected')
+    app.listen(port, () => {
+      console.log(` 🚀 Server is running on port ${port}`)
+    })
+  })
+  .catch((err) => console.log(err))
 
-app.listen(3000, () => {
-  console.log('server is running on port 3000 ')
-})
+app.use(router)
