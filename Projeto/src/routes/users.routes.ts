@@ -24,18 +24,14 @@ usersRoutes.get(
   },
 )
 
-usersRoutes.post(
-  '/',
-  authorizationMiddleware,
-  async (req: Request, res: Response) => {
-    try {
-      await usersServices.create(req.body)
-      res.status(201).send({ message: 'criado com sucesso' })
-    } catch (error: any) {
-      res.status(400).send({ message: error.message })
-    }
-  },
-)
+usersRoutes.post('/', async (req: Request, res: Response) => {
+  try {
+    await usersServices.create(req.body)
+    res.status(201).send({ message: 'usuário criado com sucesso' })
+  } catch (error: any) {
+    res.status(400).send({ message: error.message })
+  }
+})
 
 usersRoutes.delete(
   '/:username',

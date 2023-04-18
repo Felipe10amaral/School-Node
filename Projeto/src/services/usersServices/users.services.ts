@@ -7,6 +7,7 @@ import { compare, hash } from 'bcrypt'
 import { InvalidCredentials } from '../../errors/users/invalidCredentials.error'
 import { sign } from 'jsonwebtoken'
 import { env } from '../../env'
+import { EmailAlreadyExists } from '../../errors/users/emailAlreadyExists'
 
 const secretJWT = env.JWT_SECRET
 
@@ -32,14 +33,14 @@ class UsersServices {
     }
 
     if (userWithSameEmail) {
-      throw new UsernameAlreadyExists()
+      throw new EmailAlreadyExists()
     }
 
     if (newUser.password) {
       newUser.password = await hash(user.password, 10)
     }
 
-    await usersRepository.create(newUser)
+    usersRepository.create(newUser)
   }
 
   async authorization(email: string, password: string) {
@@ -87,6 +88,26 @@ class UsersServices {
     })
 
     const userUpdated = registerSchema.parse(user)
+
+    const userWithSameUsername = await usersRepository.getUserName(
+      userUpdated.username,
+    )
+
+    const userWithSameEmail = await usersRepository.getEmailUser(
+      userUpdated.email,
+    )
+
+    if (userWithSameUsername) {
+      throw new UsernameAlreadyExists()
+    }
+
+    if (userWithSameEmail) {
+      throw new EmailAlreadyExists()
+    }
+
+    if (userUpdated.password) {
+      userUpdated.password = await hash(userUpdated.password, 10)
+    }
 
     return usersRepository.update(username, userUpdated)
   }
