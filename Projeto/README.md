@@ -17,6 +17,7 @@ E-Order Service: It is an application that controls service orders for cell phon
 ## RNs (Regras de negócio)
 
 - [x] O usuário não deve poder se cadastrar com um e-mail duplicado;
+- [x] O usuário não deve poder se cadastrar com um username duplicado;
 - [x] O usuário não pode listar notas sem estar logado;
 - [x] O cliente só pode pesquisar uma nota de serviço que seja de algum serviço seu;
 - [x] só um usuario logado poderá cadastrar uma nota de serviço;
@@ -28,3 +29,10 @@ E-Order Service: It is an application that controls service orders for cell phon
 - [x] A senha do usuário precisa estar criptografada;
 - [x] Os dados da aplicação precisam estar persistidos em um banco de dados;
 - [x] O usuário deve ser identificado por um JWT (JSON Web Token);
+
+```
+
+ # Clone the remote repository
+
+
+```
